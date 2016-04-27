@@ -1,0 +1,110 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.prestacaocontascontabilidadefechamento" description="Guarda os dados de fechamento da prestação de contas." prefix="" label="Fechamento da Prestação de Contas" type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.prestacaocontascontabilidadefechamento_sequencial_seq" ></sequence>
+    </field>
+    <field name="reduzido"
+           conteudo="int4"
+           description="Reduzido da Conta"
+           inivalue="0"
+           label="Reduzido"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Reduzido"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="mes"
+           conteudo="int4"
+           description="Mês do fechamento"
+           inivalue="0"
+           label="Mês"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Mês"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="exercicio"
+           conteudo="int4"
+           description="Exercício do fechamento"
+           inivalue="0"
+           label="Exercício"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Exercício"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="status"
+           conteudo="int4"
+           description="Status do Fechamento"
+           inivalue="1"
+           label="Status"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Status"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+    <field name="motivo"
+           conteudo="text"
+           description="Motivo da Diligência"
+           inivalue="null"
+           label="Motivo"
+           size="2"
+           null="t"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Motivo"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk name="sequencial"></fieldpk>
+  </primarykey>
+  <foreignkeys>
+    <foreignkey reference="saltes" inner='true'>
+      <fieldfk name="reduzido" reference="k13_conta"></fieldfk>
+    </foreignkey>
+  </foreignkeys>
+</table>
