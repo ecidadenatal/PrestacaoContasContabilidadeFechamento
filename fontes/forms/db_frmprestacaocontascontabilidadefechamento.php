@@ -35,11 +35,10 @@
 <table border="0">
   <tr>
     <td>
-      <? db_ancora("$Lc61_codcon",'js_pesquisa();',1); ?>
+      <? db_ancora("$Lc61_reduz",'js_pesquisa();',1); ?>
     </td>
     <td>
-      <? db_input('c61_codcon',8,"",true,'text',1);  ?>
-      <? db_input('c61_reduz',8,"",true,'text',3);  ?>
+      <? db_input('c61_reduz',8,"",true,'text',1);  ?>
       <? db_input('c60_descr' ,50,"",true,'text',3);  ?>
     </td>
   </tr>
@@ -82,31 +81,21 @@
 </table>
 </fieldset>
 </center>
-<input name="db_opcao" type="submit" id="db_opcao" value="Incluir" onclick="js_salvarFechamento();" <?=($db_botao==false?"disabled":"")?> >
+<input name="db_opcao" type="button" id="db_opcao" value="Incluir" onclick="js_salvarFechamento();" <?=($db_botao==false?"disabled":"")?> >
 <!--<input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisaPrestacao();" >-->
 </form>
 <script>
 
 function js_pesquisa(){
-  js_OpenJanelaIframe('top.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?funcao_js=parent.js_preenchepesquisa|c61_codcon|c61_reduz|c60_descr','Pesquisa',true);
+  js_OpenJanelaIframe('top.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?funcao_js=parent.js_preenchepesquisa|c61_reduz|c60_descr','Pesquisa',true);
 }
-function js_preenchepesquisa(chave1,chave2,chave3){
-  db_iframe_conplanoreduz.hide();
-  document.form1.c61_codcon.value=chave1;
-  document.form1.c61_reduz.value=chave2;
-  document.form1.c60_descr.value=chave3;
-}
+function js_preenchepesquisa(chave1,chave2){
 
-/*function js_pesquisaPrestacao(){
-  db_iframe.jan.location.href = 'func_prestacaocontascontabilidadefechamento.php?funcao_js=parent.js_preenchepesquisaPrestacao|0';
-  db_iframe.mostraMsg();
-  db_iframe.show();
-  db_iframe.focus();
+  db_iframe_conplanoreduz.hide();
+  document.form1.c61_reduz.value=chave1;
+  document.form1.c60_descr.value=chave2;
+  js_verificaMes();
 }
-function js_preenchepesquisaPrestacao(chave){
-  db_iframe.hide();
-  location.href = '<?=basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"])?>'+"?chavepesquisa="+chave;
-}*/
 
 function js_status(){
   //$('trMotivo').style.display = $('status').value == 2 ? 'table-row' : 'none';
@@ -146,7 +135,7 @@ function js_salvarFechamento() {
   oParam.ano      = ano;
   oParam.motivo   = motivo;
 
-  new Ajax.Request('con4_prestacaocontascontabilidadefechamento001.RPC.php',
+  var oAjax = new Ajax.Request('con4_prestacaocontascontabilidadefechamento001.RPC.php',
       {method: 'post',
         parameters: 'json='+Object.toJSON(oParam),
         onComplete: js_completaFechamento
@@ -156,17 +145,75 @@ function js_salvarFechamento() {
 function js_completaFechamento(oAjax) {
   
   js_removeObj("msgBox");
-alert(eval("("+oAjax.responseText+")"));
   var obj = eval("("+oAjax.responseText+")");
-  limpaTela();
+  
+  alert(obj.mensagem.urlDecode());
 
+  if (obj.erro == true) {
+
+    return false;
+  }
+  
+  limpaTela();
   return true;
 }
 
+function js_verificaMes() {
+
+  var reduzido = $('c61_reduz').value;
+  
+  js_divCarregando("Aguarde, consultando fechamentos","msgBox");
+
+  var oParam = new Object();
+  oParam.exec     = 'getUltimoMesAno';
+  oParam.reduzido = reduzido;  
+
+  var oAjax = new Ajax.Request('con4_prestacaocontascontabilidadefechamento001.RPC.php',
+      {method: 'post',
+        parameters: 'json='+Object.toJSON(oParam),
+        onComplete: js_completaMes
+      });
+}
+
+function js_completaMes(oAjax) {
+
+  js_removeObj("msgBox");
+  var obj = eval("("+oAjax.responseText+")");
+
+  if (obj.erro == false) {
+
+    var mes = parseInt(obj.mes)+1;
+    var ano = parseInt(obj.ano);
+
+    //caso o último mês tenha sido dezembro
+    if (mes == 13) {
+      mes = 1;
+      ano++;
+    }
+
+    $('mes').value    = mes;
+    $('mes').disabled = true;
+    
+    $('ano').value    = ano;
+    $('ano').disabled = true;
+    return true;
+  }
+
+  $('mes').disabled = false;
+  $('ano').disabled = false;
+  return false;
+}
+
 function limpaTela(){
-  $('c61_reduz').value = '';
+  
+  $('c61_reduz').value  = '';
+  $('c60_descr').value  = '';
   $('status').value = 0;
   $('motivo').value = "";
+  $('mes').value = 1;
+
+  $('mes').disabled = false;
+  $('ano').disabled = false;
 }
 
 </script>

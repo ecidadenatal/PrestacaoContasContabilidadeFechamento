@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <plugin name="PrestacaoContasContabilidadeFechamento" label="Prestação de Contas Fechamento da Contabilidade" plugin-version="1.0" ecidade-version="2.3.47" id-modulo="209">
+   <id id="PrestacaoContasContabilidadeFechamento"> </id>
+   <files>    
+      <!-- rpc -->
+      <file name="con4_prestacaocontascontabilidadefechamento001.RPC.php"    path="/con4_prestacaocontascontabilidadefechamento001.RPC.php" />
+
+      <!-- outros -->
+      <file name="con4_prestacaocontascontabilidadefechamento001.php"    path="/con4_prestacaocontascontabilidadefechamento001.php" />
+
+      <!-- forms -->
+      <file name="db_frmprestacaocontascontabilidadefechamento.php"     path="/forms/db_frmprestacaocontascontabilidadefechamento.php" />
+
+      <!-- classe -->
+      <file name="db_prestacaocontascontabilidadefechamento_classe.php"    path="/classes/db_prestacaocontascontabilidadefechamento_classe.php" />
+
+      <!-- dd -->
+      <file name="plugins.prestacaocontascontabilidadefechamento.dd.xml"    path="/dd/tabelas/plugins.prestacaocontascontabilidadefechamento.dd.xml" />
+
+   </files>
+
+   <estrutura install="/instalacao.sql" uninstall="/desinstalacao.sql">
+   </estrutura>
+
+  </plugin>
+</manifest>    

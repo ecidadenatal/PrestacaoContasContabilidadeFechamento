@@ -56,21 +56,41 @@ try {
       $oDaoPrestacaoContasContabilidadeFechamento->incluir(null);
 
       if ($oDaoPrestacaoContasContabilidadeFechamento->erro_status == 0) {
-        throw new DBException("Erro ao fechar a prestaÃ§Ã£o de contas. ".$oDaoPrestacaoContasContabilidadeFechamento->erro_msg);
+        throw new DBException("Erro ao fechar a prestação de contas. ".$oDaoPrestacaoContasContabilidadeFechamento->erro_msg);
       }
 
-      $oRetorno->mensagem = urlencode("Fechamento da PrestaÃ§Ã£o de Contas incluÃ­do com sucesso.");
-    
-      echo $oJson->encode($oRetorno);
+      $oRetorno->mensagem = urlencode("Fechamento da Prestação de Contas incluído com sucesso.");
+      db_fim_transacao(false);
+    break;
 
+    case "getUltimoMesAno":
+
+      $sWhere  = "reduzido = {$oParam->reduzido}";
+      $sWhere .= " and exercicio = (select max(exercicio) 
+                                    from plugins.prestacaocontascontabilidadefechamento 
+                                    where reduzido = {$oParam->reduzido})";
+
+      $oDaoPrestacaoContasContabilidadeFechamento = new cl_prestacaocontascontabilidadefechamento();
+      $sSqlPrestacaoContasMes = $oDaoPrestacaoContasContabilidadeFechamento->sql_query_prestacaocontassaltes("coalesce(max(mes), 0) as mes, coalesce(max(exercicio), 0) as ano", "", $sWhere);
+      $rsPrestacaoContasMes   = $oDaoPrestacaoContasContabilidadeFechamento->sql_record($sSqlPrestacaoContasMes);
+        
+      $oDadosPrestacaoContasMes = db_utils::fieldsMemory($rsPrestacaoContasMes, 0);
+      
+      if ($oDadosPrestacaoContasMes->ano != 0 && $oDadosPrestacaoContasMes->mes != 0) {
+
+        $oRetorno->ano = $oDadosPrestacaoContasMes->ano;
+        $oRetorno->mes = $oDadosPrestacaoContasMes->mes;
+      } else {
+        
+        $oRetorno->erro = true;
+      }
       db_fim_transacao(false);
     break;
 
     default:
 
       $oRetorno->erro = true;
-      
-      echo $oJson->encode($oRetorno);
+      $oRetorno->mensagem = urlencode("Opção de operação não definida.");
       db_fim_transacao(false);
     break;
   }
