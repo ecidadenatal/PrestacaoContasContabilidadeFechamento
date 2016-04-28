@@ -26,7 +26,7 @@
  */
 
 require("libs/db_stdlib.php");
-require("libs/db_conecta.php");
+require("libs/db_conecta_plugin.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
 include("classes/db_prestacaocontascontabilidadefechamento_classe.php");

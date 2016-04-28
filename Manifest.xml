@@ -25,7 +25,7 @@
 
    <menus>
       <menu type="4">
-        <item name="Prestação de Contas Fechamento" file="con4_prestacaocontascontabilidadefechamento001.php" liberado-cliente="true" >
+        <item name="Prestação de Contas Fechamento" file="con4_prestacaocontascontabilidadefechamento001.php" liberado-cliente="true" />
       </menu>
     </menus>
 
