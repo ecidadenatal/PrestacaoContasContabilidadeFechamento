@@ -69,6 +69,7 @@ try {
       $sWhere .= " and exercicio = (select max(exercicio) 
                                     from plugins.prestacaocontascontabilidadefechamento 
                                     where reduzido = {$oParam->reduzido})";
+      $sWhere .= " and status = 1";
 
       $oDaoPrestacaoContasContabilidadeFechamento = new cl_prestacaocontascontabilidadefechamento();
       $sSqlPrestacaoContasMes = $oDaoPrestacaoContasContabilidadeFechamento->sql_query_prestacaocontassaltes("coalesce(max(mes), 0) as mes, coalesce(max(exercicio), 0) as ano", "", $sWhere);
