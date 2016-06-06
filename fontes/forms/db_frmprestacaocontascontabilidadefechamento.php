@@ -48,11 +48,11 @@
     </td>
     <td> 
       <?
-        db_select("mes", array_combine(range(1,12), range(1,12)), true, 1, "style='width: 50px;'");
+        db_select("mes", array_combine(range(1,12), range(1,12)), true, 1, "onchange='js_verificaMes()'");
 
         $ano_atual = db_getsession("DB_anousu");
         $ano_inicio = $ano_atual - 1;
-        db_select("ano", array_combine(range($ano_inicio, $ano_atual), range($ano_inicio, $ano_atual)), true, 1, "style='width: 80px;'"); 
+        db_select("ano", array_combine(range($ano_inicio, $ano_atual), range($ano_inicio, $ano_atual)), true, 1, "onchange='js_verificaMes()'"); 
       ?>
     </td>
   </tr>
@@ -82,7 +82,6 @@
 </fieldset>
 </center>
 <input name="db_opcao" type="button" id="db_opcao" value="Incluir" onclick="js_salvarFechamento();" <?=($db_botao==false?"disabled":"")?> >
-<!--<input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisaPrestacao();" >-->
 </form>
 <script>
 
@@ -112,7 +111,7 @@ function js_preenchepesquisa2(sDescr,lErro){
 }
 
 function js_status(){
-  //$('trMotivo').style.display = $('status').value == 2 ? 'table-row' : 'none';
+  
   $('motivo').disabled = $('status').value == 2 ? false : true;
 }
 
@@ -179,8 +178,10 @@ function js_verificaMes() {
   js_divCarregando("Aguarde, consultando fechamentos","msgBox");
 
   var oParam = new Object();
-  oParam.exec     = 'getUltimoMesAno';
+  oParam.exec     = 'validaMesAno';
   oParam.reduzido = reduzido;  
+  oParam.mes      = $('mes').value;
+  oParam.ano      = $('ano').value;
 
   var oAjax = new Ajax.Request('con4_prestacaocontascontabilidadefechamento001.RPC.php',
       {method: 'post',
@@ -194,28 +195,13 @@ function js_completaMes(oAjax) {
   js_removeObj("msgBox");
   var obj = eval("("+oAjax.responseText+")");
 
-  if (obj.erro == false) {
-
-    var mes = parseInt(obj.mes)+1;
-    var ano = parseInt(obj.ano);
-
-    //caso o último mês tenha sido dezembro
-    if (mes == 13) {
-      mes = 1;
-      ano++;
-    }
-
-    $('mes').value    = mes;
-    $('mes').disabled = true;
-    
-    $('ano').value    = ano;
-    $('ano').disabled = true;
-    return true;
+  if (obj.erro == false && obj.lMesFechado == true) {
+    alert("Já foi feita a prestação de contas do mês selecionado.");
+    $('db_opcao').disabled = true;
+    return;
   }
 
-  $('mes').value    = 1;
-  $('mes').disabled = false;
-  $('ano').disabled = false;
+  $('db_opcao').disabled = false;
   return false;
 }
 

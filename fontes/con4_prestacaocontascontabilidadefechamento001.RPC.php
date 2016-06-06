@@ -63,27 +63,24 @@ try {
       db_fim_transacao(false);
     break;
 
-    case "getUltimoMesAno":
+    case "validaMesAno":
 
       $sWhere  = "reduzido = {$oParam->reduzido}";
-      $sWhere .= " and exercicio = (select max(exercicio) 
-                                    from plugins.prestacaocontascontabilidadefechamento 
-                                    where reduzido = {$oParam->reduzido})";
-      $sWhere .= " and status = 1";
+      $sWhere .= " and exercicio = {$oParam->ano}";
+      $sWhere .= " and mes = {$oParam->mes}";
 
       $oDaoPrestacaoContasContabilidadeFechamento = new cl_prestacaocontascontabilidadefechamento();
-      $sSqlPrestacaoContasMes = $oDaoPrestacaoContasContabilidadeFechamento->sql_query_prestacaocontassaltes("coalesce(max(mes), 0) as mes, coalesce(max(exercicio), 0) as ano", "", $sWhere);
+      $sSqlPrestacaoContasMes = $oDaoPrestacaoContasContabilidadeFechamento->sql_query_prestacaocontassaltes("status", "", $sWhere);
       $rsPrestacaoContasMes   = $oDaoPrestacaoContasContabilidadeFechamento->sql_record($sSqlPrestacaoContasMes);
         
       $oDadosPrestacaoContasMes = db_utils::fieldsMemory($rsPrestacaoContasMes, 0);
       
-      if ($oDadosPrestacaoContasMes->ano != 0 && $oDadosPrestacaoContasMes->mes != 0) {
+      if ($oDadosPrestacaoContasMes->status == 1) {
 
-        $oRetorno->ano = $oDadosPrestacaoContasMes->ano;
-        $oRetorno->mes = $oDadosPrestacaoContasMes->mes;
+        $oRetorno->lMesFechado = true;
       } else {
         
-        $oRetorno->erro = true;
+        $oRetorno->lMesFechado = false;
       }
       db_fim_transacao(false);
     break;

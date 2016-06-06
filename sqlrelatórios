@@ -10,6 +10,7 @@ from plugins.prestacaocontascontabilidadefechamento
 where k13_conta = $conta and exercicio = $ano
 order by exercicio, mes;
 
+--------------------------------
 
 select
 	k13_conta, 
@@ -20,6 +21,6 @@ from saltes
 	inner join empagetipo on k13_conta = e83_conta
 	 left join (select max(mes) as mes, max(exercicio) as ano, reduzido
 	 			from plugins.prestacaocontascontabilidadefechamento 
-	 			where exercicio = 2015
+	 			where exercicio = $ano
 	 			group by reduzido) pccf on pccf.reduzido = k13_conta
 order by k13_conta;
