@@ -25,13 +25,13 @@
  *                                licenca/licenca_pt.txt
  */
 
-require_once ("libs/db_stdlib.php");
-require_once ("libs/db_utils.php");
-require_once ("libs/db_app.utils.php");
-require_once ("libs/db_conecta_plugin.php");
-require_once ("libs/db_sessoes.php");
-require_once ("libs/JSON.php");
-require_once ("dbforms/db_funcoes.php");
+require_once(modification("libs/db_stdlib.php"));
+require_once(modification("libs/db_utils.php"));
+require_once(modification("libs/db_app.utils.php"));
+require_once(modification("libs/db_conecta_plugin.php"));
+require_once(modification("libs/db_sessoes.php"));
+require_once(modification("libs/JSON.php"));
+require_once(modification("dbforms/db_funcoes.php"));
 
 $oJson              = new services_json();
 $oParam             = $oJson->decode(str_replace("\\","",$_POST["json"]));
@@ -48,18 +48,37 @@ try {
     case "salvarFechamento":
 
       $oDaoPrestacaoContasContabilidadeFechamento = new cl_prestacaocontascontabilidadefechamento();
-      $oDaoPrestacaoContasContabilidadeFechamento->reduzido  = $oParam->reduzido;
-      $oDaoPrestacaoContasContabilidadeFechamento->mes       = $oParam->mes;
-      $oDaoPrestacaoContasContabilidadeFechamento->exercicio = $oParam->ano;
-      $oDaoPrestacaoContasContabilidadeFechamento->status    = $oParam->statusFechamento;
-      $oDaoPrestacaoContasContabilidadeFechamento->motivo    = $oParam->motivo;
-      $oDaoPrestacaoContasContabilidadeFechamento->incluir(null);
-
-      if ($oDaoPrestacaoContasContabilidadeFechamento->erro_status == 0) {
-        throw new DBException("Erro ao fechar a prestação de contas. ".$oDaoPrestacaoContasContabilidadeFechamento->erro_msg);
+      
+      /*
+        Caso o tipo de acao seja reabertura:
+          - verificamos se existe um fechamento para a conta e alteramos o campo ativo para false 
+        Caso contrario realizamos o fechamento da conta
+      */
+      if ($oParam->acao == "reabertura") {
+      	
+      	$sSqlReabertura = "update plugins.prestacaocontascontabilidadefechamento set ativo = 'f' 
+      			            where reduzido = {$oParam->reduzido} 
+      	                      and mes = {$oParam->mes} 
+      	                      and exercicio = {$oParam->ano} ";
+      	$rsReabertura = $oDaoPrestacaoContasContabilidadeFechamento->sql_record($sSqlReabertura);
+        if ($oDaoPrestacaoContasContabilidadeFechamento->erro_status == "0") {
+          throw new DBException("Erro ao reabrir conta da prestação de contas. ".$oDaoPrestacaoContasContabilidadeFechamento->erro_msg);
+        }
+      	
+      } else {
+        $oDaoPrestacaoContasContabilidadeFechamento->reduzido  = $oParam->reduzido;
+        $oDaoPrestacaoContasContabilidadeFechamento->mes       = $oParam->mes;
+        $oDaoPrestacaoContasContabilidadeFechamento->exercicio = $oParam->ano;
+        $oDaoPrestacaoContasContabilidadeFechamento->status    = $oParam->statusFechamento;
+        $oDaoPrestacaoContasContabilidadeFechamento->motivo    = $oParam->motivo;
+        $oDaoPrestacaoContasContabilidadeFechamento->ativo     = "t";
+        $oDaoPrestacaoContasContabilidadeFechamento->incluir(null);
+        if ($oDaoPrestacaoContasContabilidadeFechamento->erro_status == 0) {
+        	throw new DBException("Erro ao fechar a prestação de contas. ".$oDaoPrestacaoContasContabilidadeFechamento->erro_msg);
+        }
       }
 
-      $oRetorno->mensagem = urlencode("Fechamento da Prestação de Contas incluído com sucesso.");
+      $oRetorno->mensagem = urlencode("Operação realizada com sucesso.");
       db_fim_transacao(false);
     break;
 
@@ -68,6 +87,7 @@ try {
       $sWhere  = "reduzido = {$oParam->reduzido}";
       $sWhere .= " and exercicio = {$oParam->ano}";
       $sWhere .= " and mes = {$oParam->mes}";
+      $sWhere .= " and ativo = 't'";
 
       $oDaoPrestacaoContasContabilidadeFechamento = new cl_prestacaocontascontabilidadefechamento();
       $sSqlPrestacaoContasMes = $oDaoPrestacaoContasContabilidadeFechamento->sql_query_prestacaocontassaltes("status", "", $sWhere);

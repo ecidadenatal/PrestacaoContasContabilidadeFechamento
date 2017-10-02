@@ -8,6 +8,7 @@
 
       <!-- outros -->
       <file name="con4_prestacaocontascontabilidadefechamento001.php"    path="/con4_prestacaocontascontabilidadefechamento001.php" />
+      <file name="PrestacaoContasContabilidadeFechamento.xml"            path="/modification/xml/PrestacaoContasContabilidadeFechamento.xml" />
 
       <!-- forms -->
       <file name="db_frmprestacaocontascontabilidadefechamento.php"     path="/forms/db_frmprestacaocontascontabilidadefechamento.php" />
@@ -22,12 +23,25 @@
 
    <estrutura install="/instalacao.sql" uninstall="/desinstalacao.sql">
    </estrutura>
-
+   
    <menus>
       <menu type="4">
-        <item name="Prestação de Contas Fechamento" file="con4_prestacaocontascontabilidadefechamento001.php" liberado-cliente="true" />
+        <item name="Prestação de Contas" file="" liberado-cliente="true" >
+          <item name="Fechamento de Contas" file="con4_prestacaocontascontabilidadefechamento001.php?acao=fechamento" liberado-cliente="true" />
+          <item name="Reabertura de Contas" file="con4_prestacaocontascontabilidadefechamento001.php?acao=reabertura" liberado-cliente="true" />
+        </item>
       </menu>
     </menus>
 
   </plugin>
-</manifest>    
+</manifest>
+
+<!--
+Fontes: 
+agendaPagamento.model.php
+emp4_empageretornoconf001.php
+cai4_planilhaarrecadacao.RPC.php
+slip.model.php
+ordemPagamento.model.php
+db_frmsaltes.php
+-->

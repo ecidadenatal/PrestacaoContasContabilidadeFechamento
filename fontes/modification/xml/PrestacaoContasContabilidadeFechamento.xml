@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<modification>
+  <name>Prestacao de Contas</name>
+  <id>PrestacaoContas</id>
+  <ecidade-version>2.3.39</ecidade-version>
+  <file path='forms/db_frmsaltes.php'>
+    <operation>
+      <search regex="true"><![CDATA[(db_input.*k13_saldo.*)\$db_opcao]]></search>
+      <add>
+        <![CDATA[$1($db_opcao!=1?3:$db_opcao)]]>
+      </add>
+    </operation>
+  </file>
+  
+  <file path='model/agendaPagamento.model.php'>
+    <operation>
+      <search regex="true"><![CDATA[(if\s*\(\s*\$oMovimento->iCodForma\s*==\s*0\s*\)\s*\{)]]></search>
+      <add>
+        <![CDATA[    
+    /* 
+     * Inicio plugin Prestacao de Contas
+     * Verificamos se a conta selecionada esta fechada para a prestação de contas
+     */
+    $oPrestacaoContas = new cl_prestacaocontascontabilidadefechamento();
+    $sWhere = "reduzido in (select e98_contabanco 
+                              from empagemovconta 
+                             where e98_codmov = {$oMovimento->iCodMov} 
+                             union 
+                            select e83_conta 
+                              from empagetipo 
+                                   inner join empagepag on e85_codtipo = e83_codtipo 
+                             where e85_codmov = {$oMovimento->iCodMov} )";
+    $sWhere .= " and mes = ".substr($dtPagamento,5,2);
+    $sWhere .= " and exercicio = ".substr($dtPagamento,0,4);
+    $sWhere .= " and ativo = 't'";
+    $oPrestacaoContas->sql_record($oPrestacaoContas->sql_query(null, "*", null, $sWhere));
+    if ($oPrestacaoContas->numrows > 0) {
+      throw new Exception("Conta Pagadora está fechada para a prestação de contas. Processo cancelado");
+    }
+    /*
+     * Fim Plugin Prestacao de Contas
+     */
+     
+     $1]]>
+      </add>
+    </operation>
+  </file> 
+
+  <file path='model/slip.model.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$clslip\s*=\s*new\s*cl_slip\(\);)]]></search>
+      <add>
+        <![CDATA[    
+    /*
+     * Inicio plugin Prestacao de Contas
+     */
+    $oPrestacaoContas = new cl_prestacaocontascontabilidadefechamento();
+    $sWhere  = " mes = ".date("m",db_getsession("DB_datausu"));;
+    $sWhere .= " and exercicio = ".date("Y",db_getsession("DB_datausu"));
+    $sWhere .= " and reduzido in (".$this->getContaDebito().", ".$this->getContaCredito().") ";
+    $sWhere .= " and ativo = 't'";
+    $rsPrestacaoContas = $oPrestacaoContas->sql_record($oPrestacaoContas->sql_query(null, "*", null, $sWhere));
+    if ($oPrestacaoContas->numrows > 0) {
+      $iConta = db_utils::fieldsMemory($rsPrestacaoContas, 0)->reduzido;    
+      throw new Exception("Conta {$iConta} está fechada para a prestação de contas. Processo cancelado");
+    }
+    /*
+     * Fim plugin Prestacao de Contas
+     */
+     
+     $1]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$sIPSessao\s*=\s*db_getsession\("DB_ip"\);)]]></search>
+      <add>
+        <![CDATA[$1    
+    /*
+     * Inicio plugin Prestacao de Contas
+     */
+    $oPrestacaoContas = new cl_prestacaocontascontabilidadefechamento();
+    $sWhere  = " mes = ".date("m",db_getsession("DB_datausu"));;
+    $sWhere .= " and exercicio = ".date("Y",db_getsession("DB_datausu"));
+    $sWhere .= " and reduzido in (select k17_debito 
+                                    from slip 
+                                   where k17_codigo = {$this->getSlip()} 
+                                   union 
+                                  select k17_credito 
+                                    from slip 
+                                   where k17_codigo = {$this->getSlip()}) ";
+    $sWhere .= " and ativo = 't'";
+    $rsPrestacaoContas = $oPrestacaoContas->sql_record($oPrestacaoContas->sql_query(null, "*", null, $sWhere));
+    if ($oPrestacaoContas->numrows > 0) {
+        $iConta = db_utils::fieldsMemory($rsPrestacaoContas, 0)->reduzido;
+        throw new Exception("Conta {$iConta} está fechada para a prestação de contas. Processo cancelado");
+    }
+    /*
+     * Fim plugin Prestacao de Contas
+     */
+     ]]>
+      </add>
+    </operation>    
+  </file>   
+  
+  <file path='classes/ordemPagamento.model.php'>
+    <operation>
+      <search regex="true"><![CDATA[(function\s*autenticar\(.*\)\s*\{)]]></search>
+      <add>
+        <![CDATA[$1
+            
+    /*
+     * Inicio plugin Prestacao de Contas
+     */
+    $oPrestacaoContas = new cl_prestacaocontascontabilidadefechamento();
+    $sWhere  = " mes = ".substr($this->dtDataUsu, 6, 2);
+    $sWhere .= " and exercicio = ".substr($this->dtDataUsu, 0, 4);
+    $sWhere .= " and reduzido = {$this->getConta()} ";
+    $sWhere .= " and ativo = 't'";
+    $oPrestacaoContas->sql_record($oPrestacaoContas->sql_query(null, "*", null, $sWhere));
+    if ($oPrestacaoContas->numrows > 0) {
+        throw new Exception("Conta {$this->getConta()} está fechada para a prestação de contas. Processo cancelado");
+    }
+    /*
+     * Fim plugin Prestacao de Contas
+     */
+     ]]>
+      </add>
+    </operation>
+  </file> 
+  
+  <file path='emp4_empageretornoconf001.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$oDados\s*=\s*db_utils::fieldsMemory\(\s*\$rsDadosEmpagedadosretmov\s*,\s*\$iRegistros\);)]]></search>
+      <add>
+        <![CDATA[$1
+            
+    /*
+     * Plugin Prestacao de Contas
+     */
+    $oPrestacaoContas = new cl_prestacaocontascontabilidadefechamento();
+    $sWhere  = " reduzido = (select e83_conta 
+                               from empagetipo 
+                                    inner join empagepag on e85_codtipo = e83_codtipo 
+                              where e85_codmov = {$oDados->e76_codmov} )";
+    $sWhere .= " and mes = ".substr($oDados->e76_dataefet,5,2);
+    $sWhere .= " and exercicio = ".substr($oDados->e76_dataefet,0,4);
+    $sWhere .= " and ativo = 't'";
+    $oPrestacaoContas->sql_record($oPrestacaoContas->sql_query(null, "*", null, $sWhere));
+    if ($oPrestacaoContas->numrows > 0) {
+        $erro_msg = "Conta Pagadora do movimento {$oDados->e76_codmov} está fechada para a prestação de contas. Processo cancelado";
+        $sqlerro = true;
+        break;
+    }
+    /*
+     * Fim Plugin Prestacao de Contas
+     */
+     ]]>
+      </add>
+    </operation>
+  </file>      
+
+</modification>

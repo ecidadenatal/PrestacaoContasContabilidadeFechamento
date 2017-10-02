@@ -25,18 +25,18 @@
  *                                licenca/licenca_pt.txt 
  */
 
-require("libs/db_stdlib.php");
-require("libs/db_conecta_plugin.php");
-include("libs/db_sessoes.php");
-include("libs/db_usuariosonline.php");
-include("classes/db_prestacaocontascontabilidadefechamento_classe.php");
-include("dbforms/db_funcoes.php");
-include("classes/db_conlancamval_classe.php");
-include("classes/db_conlancam_classe.php");
-include("classes/db_conlancamcompl_classe.php");
-include("classes/db_conplano_classe.php");
-include("libs/db_sql.php");
-include("classes/db_conplanoreduz_classe.php");
+require(modification("libs/db_stdlib.php"));
+require(modification("libs/db_conecta_plugin.php"));
+include(modification("libs/db_sessoes.php"));
+include(modification("libs/db_usuariosonline.php"));
+include(modification("classes/db_prestacaocontascontabilidadefechamento_classe.php"));
+include(modification("dbforms/db_funcoes.php"));
+include(modification("classes/db_conlancamval_classe.php"));
+include(modification("classes/db_conlancam_classe.php"));
+include(modification("classes/db_conlancamcompl_classe.php"));
+include(modification("classes/db_conplano_classe.php"));
+include(modification("libs/db_sql.php"));
+include(modification("classes/db_conplanoreduz_classe.php"));
 
 ini_set('display_errors',1);
 ini_set('display_startup_erros',1);
@@ -80,7 +80,7 @@ $anousu = db_getsession("DB_anousu");
     <td height="430" align="center" valign="center" bgcolor="#CCCCCC"> 
     <center>
     <?
-    	include("forms/db_frmprestacaocontascontabilidadefechamento.php");
+    	include(modification("forms/db_frmprestacaocontascontabilidadefechamento.php"));
     ?>
     </center>
 	</td>

@@ -27,11 +27,15 @@
 
 //MODULO: caixa
 
+$sLegend = "Contabilidade - Fechamento da Prestação de Contas";
+if ($acao == "reabertura") {
+  $sLegend = "Contabilidade - Reabertura de Fechamento da Prestação de Contas";
+}
 ?>
 <form name="form1" method="post" action="">
 <center>
 <fieldset>
-<legend>Contabilidade - Fechamento da Prestação de Contas</legend>
+<legend><?=$sLegend?></legend>
 <table border="0">
   <tr>
     <td>
@@ -84,12 +88,13 @@
 <input name="db_opcao" type="button" id="db_opcao" value="Incluir" onclick="js_salvarFechamento();" <?=($db_botao==false?"disabled":"")?> >
 </form>
 <script>
+var acao = "<?=$acao?>";
 
 function js_pesquisa(lMostra){
   if (lMostra) {
-    js_OpenJanelaIframe('top.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?funcao_js=parent.js_preenchepesquisa|c61_reduz|c60_descr','Pesquisa',lMostra);
+    js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?funcao_js=parent.js_preenchepesquisa|c61_reduz|c60_descr','Pesquisa',lMostra);
   } else {
-    js_OpenJanelaIframe('top.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?pesquisa_chave='+$F("c61_reduz")+'&funcao_js=parent.js_preenchepesquisa2','Pesquisa',lMostra);
+    js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_conplanoreduz','func_conplanoreduz.php?pesquisa_chave='+$F("c61_reduz")+'&funcao_js=parent.js_preenchepesquisa2','Pesquisa',lMostra);
   }
 }
 function js_preenchepesquisa(chave1,chave2){
@@ -147,6 +152,7 @@ function js_salvarFechamento() {
   oParam.mes      = mes;
   oParam.ano      = ano;
   oParam.motivo   = motivo;
+  oParam.acao     = acao;
 
   var oAjax = new Ajax.Request('con4_prestacaocontascontabilidadefechamento001.RPC.php',
       {method: 'post',
@@ -166,7 +172,12 @@ function js_completaFechamento(oAjax) {
 
     return false;
   }
-  
+
+  if (acao == "fechamento") {
+	jan = window.open('con2_fechamentoprestacaocontas_natal002.php?ano='+ano+'&reduzido='+reduzido+'&mes='+mes);
+	jan.moveTo(0,0);
+  }
+
   limpaTela();
   return true;
 }

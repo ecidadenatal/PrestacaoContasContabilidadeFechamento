@@ -4,7 +4,8 @@ create table plugins.prestacaocontascontabilidadefechamento (sequencial integer,
                                                     		 mes integer not null,
                                                     		 exercicio integer not null,
 															 status integer not null,   
-															 motivo text
+															 motivo text,
+															 ativo varchar(1)
 															);
 
 create sequence plugins.prestacaocontascontabilidadefechamento_sequencial_seq; 

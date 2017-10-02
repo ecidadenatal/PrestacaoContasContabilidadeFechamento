@@ -98,7 +98,23 @@
            ispk="f"
            hassequence="f">
     </field>
-  </fields>
+    <field name="ativo"
+           conteudo="varchar(1)"
+           description="Fechamento Ativo?"
+           inivalue="1"
+           label="Ativo"
+           size="1"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="0"
+           tipoobj="text"
+           labelrel="Ativo"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>  
+  </fields>    
   <primarykey>
     <fieldpk name="sequencial"></fieldpk>
   </primarykey>
